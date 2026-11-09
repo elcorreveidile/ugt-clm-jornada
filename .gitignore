@@ -4,6 +4,7 @@ dist
 .env.*
 !.env.example
 !.env.mobile.example
+!.env.produccion.example
 .vercel
 server/generated
 *.tsbuildinfo

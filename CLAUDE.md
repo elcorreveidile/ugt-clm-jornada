@@ -41,3 +41,8 @@ incidencias, horario típico y textos. Añadir un colectivo = añadir un perfil.
   dispositivo; año del período según el curso académico: septiembre-diciembre el primero, enero-agosto el segundo;
   no se guardan nombres de profesores ni alumnado). Responsable del tratamiento configurable (`RESPONSABLE_*`,
   `GET /api/info`): Javier decidirá si figura él o la Sección Sindical. Dominio: `jornada.ugtclmgranada.org`.
+- **2026-11-09**: 0.3.0. Despliegue elegido por Javier: **VPS en España con Docker** (no Vercel; `vercel.json`
+  queda como alternativa). `docker-compose.yml` = app (`server/main.ts`: web + API, sellado de pendientes cada
+  15 min) + Postgres 16 + Caddy (HTTPS) + copias diarias (`deploy/backup.sh`). El arranque aplica el esquema con
+  `prisma db push` (sin aceptar pérdida de datos). Guía en `docs/DESPLIEGUE-VPS.md`. Probado con Docker de punta a
+  punta (HTTPS, sello real, PDF, disparador, copia y restauración).

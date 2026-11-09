@@ -68,6 +68,7 @@ app.post("/auth/request", async (c) => {
   const r = await requestLogin(b.data.email);
   if (r === "invalid") return c.json({ error: "Escribe un correo válido" }, 400);
   if (r === "limit") return c.json({ error: "Has pedido varios enlaces seguidos. Espera unos minutos." }, 429);
+  if (r === "mail") return c.json({ error: "No se ha podido enviar el correo. Inténtalo más tarde o avisa a quien administra la app." }, 503);
   return c.json({ ok: true });
 });
 

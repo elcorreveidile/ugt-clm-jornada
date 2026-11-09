@@ -1,6 +1,6 @@
 {
   "name": "ugt-clm-jornada",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.24.0",
@@ -18,7 +18,8 @@
     "postinstall": "prisma generate",
     "build:mobile": "tsc -p . && vite build --mode mobile && cap sync",
     "cap:android": "cap open android",
-    "cap:ios": "cap open ios"
+    "cap:ios": "cap open ios",
+    "start": "node --import tsx server/main.ts"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.0",

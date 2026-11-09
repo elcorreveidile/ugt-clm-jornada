@@ -102,18 +102,26 @@ Sin `BREVO_API_KEY`, el enlace y el código de acceso salen en el log de la API.
 Validación: `pnpm lint && pnpm typecheck && pnpm test && pnpm build`. Los tests de integración necesitan un Postgres
 con el SQL aplicado: `JORNADA_TEST_DATABASE_URL=postgresql://… pnpm test` (sin ella se saltan).
 
-## Despliegue (Vercel + Neon)
+## Despliegue
 
-1. Crear el proyecto en Vercel desde este repositorio y una base de datos en Neon.
-2. Variables (ver `.env.example`): `JORNADA_DATABASE_URL`, `APP_URL=https://jornada.ugtclmgranada.org`,
-   `BREVO_API_KEY`, `MAIL_FROM_EMAIL`, `MAIL_FROM_NAME`, `CRON_SECRET`, las del responsable del tratamiento
-   (`RESPONSABLE_NOMBRE`, `RESPONSABLE_NIF`, `RESPONSABLE_DIRECCION`, `RESPONSABLE_CONTACTO`, que salen en el aviso legal)
-   y, si se cambia de autoridad de sellado, las `TSA_*`.
-3. Aplicar el esquema contra producción: `pnpm db:push` (también aplica `prisma/sql/append-only.sql`).
-4. Dominio: **`jornada.ugtclmgranada.org`**. En Vercel, añadirlo al proyecto; en el DNS de `ugtclmgranada.org`
-   (donde se gestione hoy la web de la sección), un registro `CNAME jornada → cname.vercel-dns.com`. La web
-   actual de la sección no se toca.
-5. Brevo: verificar el dominio remitente (`ugtclmgranada.org`) para que el correo de acceso no caiga en spam.
+### Recomendado: servidor propio en España (Docker)
+
+Guía paso a paso: [`docs/DESPLIEGUE-VPS.md`](docs/DESPLIEGUE-VPS.md). En resumen:
+
+```
+cp .env.produccion.example .env   # dominio, contraseña de la BD, Brevo, responsable
+docker compose up -d --build      # app + Postgres + Caddy (HTTPS) + copias diarias
+```
+
+- `Dockerfile` y `deploy/entrypoint.sh`: al arrancar aplica el esquema (sin borrar datos nunca) y los disparadores,
+  y sirve la web y la API en el mismo puerto (`server/main.ts`). Cada 15 minutos sella lo pendiente.
+- `deploy/Caddyfile`: HTTPS automático y cabeceras de seguridad.
+- `deploy/backup.sh`: copia diaria con `pg_dump`, 30 días. Hay que sacarlas también fuera del servidor (ver la guía).
+- Dominio: `jornada.ugtclmgranada.org` (registro `A` a la IP del servidor).
+
+### Alternativa: Vercel + Neon
+
+`vercel.json` y `api/index.ts` siguen preparados. Variables: las de `.env.example`. Esquema: `pnpm db:push`.
 
 ## Apps para Google Play y App Store
 

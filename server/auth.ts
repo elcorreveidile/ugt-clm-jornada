@@ -24,7 +24,7 @@ export function normalizeEmail(raw: string): string | null {
 }
 
 /** Envía el enlace de acceso. Responde igual exista o no la cuenta. */
-export async function requestLogin(rawEmail: string): Promise<"ok" | "invalid" | "limit"> {
+export async function requestLogin(rawEmail: string): Promise<"ok" | "invalid" | "limit" | "mail"> {
   const email = normalizeEmail(rawEmail);
   if (!email) return "invalid";
   const recent = await prisma.loginToken.count({
@@ -37,7 +37,7 @@ export async function requestLogin(rawEmail: string): Promise<"ok" | "invalid" |
     data: { email, tokenHash: sha(token), codeHash: sha(`${email}:${code}`), expiresAt: new Date(Date.now() + LOGIN_TTL_MS) },
   });
   const link = `${appUrl()}/entrar?token=${encodeURIComponent(token)}`;
-  await sendEmail(
+  const enviado = sendEmail(
     email,
     "Tu enlace para entrar en el registro de jornada",
     `<p>Pulsa el botón para entrar en tu registro de jornada. El enlace caduca en 20 minutos y solo sirve una vez.</p>
@@ -48,6 +48,12 @@ export async function requestLogin(rawEmail: string): Promise<"ok" | "invalid" |
      <p style="color:#999;font-size:11px">${escapeHtml(CREDITO)}</p>`,
     `Entra en tu registro de jornada con este enlace (caduca en 20 minutos):\n${link}\n\nEn la app del móvil, escribe este código: ${code}\n\nSi no lo has pedido tú, ignora este correo.`,
   );
+  try {
+    await enviado;
+  } catch (e) {
+    console.error("[correo]", e instanceof Error ? e.message : e);
+    return "mail";
+  }
   return "ok";
 }
 
