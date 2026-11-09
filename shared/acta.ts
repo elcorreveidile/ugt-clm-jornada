@@ -68,7 +68,8 @@ export const fechaCorta = (iso: string) => iso.split("-").reverse().map((x, i) =
 /** «del 4 de noviembre al 1 de diciembre» → fechas ISO, con el año del curso académico. */
 export function leerPeriodo(texto: string, cursoAcademico?: string, fechaImpresion?: string): { desde: string; hasta: string } | null {
   const t = texto.toLowerCase();
-  const m = t.match(/(\d{1,2})\s+de\s+([a-zé]+)(?:\s+de\s+(\d{4}))?\s+(?:al|a|hasta(?:\s+el)?)\s+(\d{1,2})\s+de\s+([a-zé]+)(?:\s+de\s+(\d{4}))?/);
+  // «del 4 de noviembre al 1 de diciembre» o, en algunas actas, «del 1 octubre al 22 diciembre».
+  const m = t.match(/(\d{1,2})\s+(?:de\s+)?([a-zé]+)(?:\s+(?:de\s+)?(\d{4}))?\s+(?:al|a|hasta(?:\s+el)?)\s+(\d{1,2})\s+(?:de\s+)?([a-zé]+)(?:\s+(?:de\s+)?(\d{4}))?/);
   if (!m) return null;
   const m1 = MESES[m[2]];
   const m2 = MESES[m[5]];

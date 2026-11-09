@@ -71,3 +71,28 @@ test("fecha corta para mostrar", async () => {
   const { fechaCorta } = await import("../shared/acta");
   assert.equal(fechaCorta("2026-11-04"), "4/11/2026");
 });
+
+test("acta trimestral: período sin «de» y profesor en singular", () => {
+  const r = leerActas(`Curso Académico:\tCurso Académico 2026-2027
+Curso:\tCurso de Lengua y Cultura Españolas
+Período:\tdel 1 octubre al 22 diciembre
+Asignatura:\tProducción Oral y Escrita
+Grupo:\t0403
+Profesor:\tBENÍTEZ LAÍNEZ, JAVIER
+Aula:\tB16
+Horario:\t12:30 - 14:30: M, J
+Fecha de impresión:\t9 de Noviembre de 2026
+NºNombre\tObservaciones`);
+  assert.equal(r.ok, true);
+  if (!r.ok) return;
+  assert.deepEqual(r.actas[0].asignacion, {
+    grupo: "0403",
+    aula: "B16",
+    dias: ["M", "J"],
+    horaInicio: "12:30",
+    horaFin: "14:30",
+    desde: "2026-10-01",
+    hasta: "2026-12-22",
+    nota: "Curso de Lengua y Cultura Españolas · Producción Oral y Escrita",
+  });
+});
