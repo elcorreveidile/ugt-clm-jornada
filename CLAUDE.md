@@ -37,3 +37,7 @@ incidencias, horario típico y textos. Añadir un colectivo = añadir un perfil.
   colectivos (hostelería y otros), con pausas, turnos de noche, desplazamientos, guardias, cantidad opcional y avisos
   de posibles incumplimientos de los arts. 34.3 y 34.4 ET. Acceso por enlace (web) y código de 6 cifras (apps).
   Pendiente: importar actas/cuadrantes (falta un ejemplo), recordatorios y biometría en las apps, revisión jurídica.
+- **2026-11-09**: 0.2.0. Importador de actas del CLM (`shared/acta.ts`; PDF con pdf.js o texto pegado, en el
+  dispositivo; año del período según el curso académico: septiembre-diciembre el primero, enero-agosto el segundo;
+  no se guardan nombres de profesores ni alumnado). Responsable del tratamiento configurable (`RESPONSABLE_*`,
+  `GET /api/info`): Javier decidirá si figura él o la Sección Sindical. Dominio: `jornada.ugtclmgranada.org`.

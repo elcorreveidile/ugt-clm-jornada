@@ -29,6 +29,10 @@ añadir un perfil.
 | Campo y manipulado | Jornadas de campaña, cajas o kilos |
 | Otro colectivo | Jornada, pausas, desplazamientos, guardias |
 
+En docencia, el horario se **importa desde las actas de la intranet del CLM**: subiendo el PDF o pegando su texto
+(`shared/acta.ts`). Se lee en el propio dispositivo y solo se guardan grupo, aula, días, horas y período; los nombres
+de los profesores y la lista del alumnado no salen del dispositivo.
+
 Para todos: fichar en el momento (botón), apuntar después con sus horas, horario o cuadrante previsto (la app propone
 lo que toca cada día), «no se hizo» con motivo, correcciones y anulaciones, y **avisos de posibles incumplimientos**
 (más de 9 h de trabajo efectivo al día, más de 6 h seguidas sin pausa, menos de 12 h entre jornadas), que se señalan
@@ -101,10 +105,15 @@ con el SQL aplicado: `JORNADA_TEST_DATABASE_URL=postgresql://… pnpm test` (sin
 ## Despliegue (Vercel + Neon)
 
 1. Crear el proyecto en Vercel desde este repositorio y una base de datos en Neon.
-2. Variables (ver `.env.example`): `JORNADA_DATABASE_URL`, `APP_URL`, `BREVO_API_KEY`,
-   `MAIL_FROM_EMAIL`, `MAIL_FROM_NAME`, `CRON_SECRET` y, si se cambia de autoridad, las `TSA_*`.
+2. Variables (ver `.env.example`): `JORNADA_DATABASE_URL`, `APP_URL=https://jornada.ugtclmgranada.org`,
+   `BREVO_API_KEY`, `MAIL_FROM_EMAIL`, `MAIL_FROM_NAME`, `CRON_SECRET`, las del responsable del tratamiento
+   (`RESPONSABLE_NOMBRE`, `RESPONSABLE_NIF`, `RESPONSABLE_DIRECCION`, `RESPONSABLE_CONTACTO`, que salen en el aviso legal)
+   y, si se cambia de autoridad de sellado, las `TSA_*`.
 3. Aplicar el esquema contra producción: `pnpm db:push` (también aplica `prisma/sql/append-only.sql`).
-4. Dominio propuesto: `jornada.ugtclmgranada.org`.
+4. Dominio: **`jornada.ugtclmgranada.org`**. En Vercel, añadirlo al proyecto; en el DNS de `ugtclmgranada.org`
+   (donde se gestione hoy la web de la sección), un registro `CNAME jornada → cname.vercel-dns.com`. La web
+   actual de la sección no se toca.
+5. Brevo: verificar el dominio remitente (`ugtclmgranada.org`) para que el correo de acceso no caiga en spam.
 
 ## Apps para Google Play y App Store
 
@@ -129,6 +138,6 @@ Pendiente antes de publicar:
 ## Pendiente
 
 - Revisión jurídica de `/aviso` y de los textos de los informes (datos del responsable entre corchetes).
-- Importar el horario desde las actas o el cuadrante (se necesita un ejemplo de cada formato).
+- Importar cuadrantes de otros colectivos (cada empresa usa un formato; se necesitan ejemplos).
 - Recordatorios y biometría en las apps.
 - Autoridad de sellado cualificada cuando la herramienta se abra a más gente.

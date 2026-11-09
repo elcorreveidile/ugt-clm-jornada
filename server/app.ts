@@ -254,6 +254,21 @@ app.get("/export/evidencia", needUser, async (c) => {
   });
 });
 
+// --- Público: datos legales -------------------------------------------------
+
+/** Responsable del tratamiento y autoridad de sellado (para el aviso legal). */
+app.get("/info", (c) =>
+  c.json({
+    responsable: {
+      nombre: process.env.RESPONSABLE_NOMBRE || "Sección Sindical de UGT en el Centro de Lenguas Modernas (Universidad de Granada)",
+      nif: process.env.RESPONSABLE_NIF || null,
+      direccion: process.env.RESPONSABLE_DIRECCION || null,
+      contacto: process.env.RESPONSABLE_CONTACTO || null,
+    },
+    tsa: tsaConfig().name,
+  }),
+);
+
 // --- Público: consulta de una huella ------------------------------------------
 
 app.get("/verificar/:hash", async (c) => {

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { api, getAsignaciones, type Asignacion } from "../api";
 import { Notice } from "../components/Layout";
+import ImportarActa from "../components/ImportarActa";
+import { fechaCorta } from "../../shared/acta";
 import { DIAS, asignacionSchema } from "../../shared/events";
 import { useMe } from "../me";
 import { hoy } from "../format";
@@ -60,6 +62,7 @@ export default function Horario() {
         <p className="text-sm text-gray-600">{perfil.textos.horarioIntro}</p>
       </div>
       {error && <Notice kind="error">{error}</Notice>}
+      {perfil.id === "DOCENCIA" && <ImportarActa existentes={list ?? []} onDone={load} />}
       {ok && <Notice kind="ok">{ok}</Notice>}
 
       {list && list.length > 0 && (
@@ -71,7 +74,7 @@ export default function Horario() {
                 <p className="text-sm text-gray-600">
                   {DIAS.filter((d) => a.dias.includes(d)).map((d) => DIA_NOMBRE[d]).join(", ")} · {a.horaInicio}–{a.horaFin}
                 </p>
-                <p className="text-xs text-gray-500">Del {a.desde} al {a.hasta}{a.nota ? ` · ${a.nota}` : ""}</p>
+                <p className="text-xs text-gray-500">Del {fechaCorta(a.desde)} al {fechaCorta(a.hasta)}{a.nota ? ` · ${a.nota}` : ""}</p>
               </div>
               <div className="flex shrink-0 flex-col gap-1 text-sm">
                 <button className="text-gray-700 underline" onClick={() => setF({ ...a, nota: a.nota ?? "" })}>Duplicar</button>

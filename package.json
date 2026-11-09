@@ -1,6 +1,6 @@
 {
   "name": "ugt-clm-jornada",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.24.0",
@@ -33,6 +33,7 @@
     "asn1js": "^4.0.0",
     "dotenv": "^18.0.10",
     "hono": "^4.13.17",
+    "pdfjs-dist": "^6.5.438",
     "pg": "^8.23.1",
     "pkijs": "^4.0.1",
     "react": "^19.3.1",

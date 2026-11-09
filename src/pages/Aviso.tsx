@@ -1,8 +1,21 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
+import { api } from "../api";
+
+interface Info {
+  responsable: { nombre: string; nif: string | null; direccion: string | null; contacto: string | null };
+  tsa: string;
+}
 
 // Texto base. Pendiente de revisión por los servicios jurídicos de UGT antes de
 // abrir la herramienta a todo el centro (los datos entre corchetes, por completar).
 export default function Aviso() {
+  const [info, setInfo] = useState<Info | null>(null);
+  useEffect(() => {
+    api<Info>("/info").then(setInfo).catch(() => {});
+  }, []);
+  const r = info?.responsable;
+  const pendiente = "[pendiente]";
   return (
     <div className="mx-auto max-w-2xl space-y-5 p-6 text-sm leading-relaxed text-gray-800">
       <h1 className="text-2xl font-bold">Aviso legal, privacidad y valor probatorio</h1>
@@ -54,7 +67,10 @@ export default function Aviso() {
 
       <section className="space-y-2">
         <h2 className="text-lg font-semibold">Privacidad</h2>
-        <p><strong>Responsable:</strong> Sección Sindical de UGT en el Centro de Lenguas Modernas de la Universidad de Granada. [Dirección y CIF de UGT por completar] · Contacto: [correo de la sección].</p>
+        <p>
+          <strong>Responsable:</strong> {r?.nombre ?? "…"}
+          {r?.nif ? ` · NIF ${r.nif}` : ""} · Dirección: {r?.direccion ?? pendiente} · Contacto: {r?.contacto ?? pendiente}.
+        </p>
         <p><strong>Datos:</strong> tu correo, tu nombre, tu DNI/NIE si decides ponerlo, tu horario asignado y lo que anotes.</p>
         <p><strong>Para qué:</strong> solo para que lleves tu registro y obtengas tus informes. Base jurídica: tu consentimiento al darte de alta (art. 6.1.a RGPD), que puedes retirar en cualquier momento borrando tu cuenta.</p>
         <p>
