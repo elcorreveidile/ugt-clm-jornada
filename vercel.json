@@ -1,0 +1,12 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "buildCommand": "pnpm build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/((?!api/|assets/).*)", "destination": "/index.html" }
+  ],
+  "crons": [{ "path": "/api/cron/sellar", "schedule": "15 3 * * *" }],
+  "functions": { "api/index.ts": { "maxDuration": 60 } }
+}

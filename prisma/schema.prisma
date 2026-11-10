@@ -1,0 +1,119 @@
+// Registro personal de jornada (desarrollado por la Sección Sindical de UGT en el CLM).
+//
+// Entry y Stamp son de SOLO ANOTACIÓN: un disparador de Postgres
+// (prisma/sql/append-only.sql, se aplica con `pnpm db:sql`) impide modificarlas
+// o borrarlas. Las correcciones son anotaciones nuevas. La única excepción es
+// borrar la cuenta entera a petición de su titular (RGPD), que se hace en una
+// transacción con `jornada.allow_delete = on`.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String   @default("")
+  nif       String?
+  /// Colectivo (shared/perfiles.ts): decide qué se registra y cómo se llama. Null = sin elegir.
+  perfil      String?
+  /// Centro de trabajo y su horario (salen en los informes; avisan de lo que queda fuera).
+  centro      String  @default("")
+  apertura    String?
+  cierre      String?
+  inicioTarde String  @default("15:00")
+  createdAt DateTime @default(now())
+
+  sessions    Session[]
+  entries     Entry[]
+  asignaciones Asignacion[]
+}
+
+model LoginToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  /// Código de 6 cifras del mismo correo (para la app móvil, donde el enlace no sirve).
+  codeHash  String
+  attempts  Int       @default(0)
+  email     String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([email, createdAt])
+}
+
+model Session {
+  id         String   @id @default(cuid())
+  tokenHash  String   @unique
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  lastSeenAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+/// Horario asignado (lo que figura en las actas de la intranet). Es editable;
+/// cada alta o baja deja además una anotación HORARIO en el registro.
+model Asignacion {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grupo      String
+  aula       String
+  dias       String[]
+  horaInicio String
+  horaFin    String
+  desde      String
+  hasta      String
+  nota       String?
+  createdAt  DateTime  @default(now())
+  archivedAt DateTime?
+
+  @@index([userId, archivedAt])
+}
+
+/// Una anotación del registro, encadenada a la anterior por su huella.
+model Entry {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  seq        Int
+  type       String
+  payload    Json
+  start      DateTime?
+  end        DateTime?
+  /// Hora del servidor en que se anotó (la que cuenta, no la del dispositivo).
+  recordedAt DateTime
+  /// MOMENTO (fichado con el botón) o POSTERIOR (apuntado después).
+  mode       String
+  prevHash   String
+  hash       String    @unique
+  /// JSON canónico exacto que se resumió en `hash` (y que se selló).
+  material   String
+  createdAt  DateTime  @default(now())
+
+  stamp Stamp?
+
+  @@unique([userId, seq])
+  @@index([userId, start])
+}
+
+/// Sello de tiempo RFC 3161 de una anotación.
+model Stamp {
+  entryId   String   @id
+  entry     Entry    @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  provider  String
+  qualified Boolean
+  genTime   DateTime
+  serial    String
+  policy    String
+  token     Bytes
+  createdAt DateTime @default(now())
+}
